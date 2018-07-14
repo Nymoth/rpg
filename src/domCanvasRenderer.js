@@ -36,20 +36,27 @@ export default class DOMCanvasRenderer implements Renderer {
   }
 
   renderCharacter(dir: string) {
+    const imgSize = 512;
+    const renderSize = 50;
+
+    const spriteSize = imgSize / 2;
+    const cx = (config.WIEWPORT_WIDTH / 2) - (renderSize / 2);
+    const cy = (config.WIEWPORT_HEIGHT / 2) - (renderSize / 2);
     let sx;
     let sy;
+
     switch (dir) {
       case 'up':
-        sx = 25;
+        sx = spriteSize;
         sy = 0;
         break;
       case 'down':
         sx = 0;
-        sy = 25;
+        sy = spriteSize;
         break;
       case 'left':
-        sx = 25;
-        sy = 25;
+        sx = spriteSize;
+        sy = spriteSize;
         break;
       case 'right':
         sx = 0;
@@ -57,10 +64,9 @@ export default class DOMCanvasRenderer implements Renderer {
         break;
       default: return;
     }
-    const cx = (config.WIEWPORT_WIDTH / 2) - 12.5;
-    const cy = (config.WIEWPORT_HEIGHT / 2) - 12.5;
-    this.characterContext.clearRect(cx, cy, 25, 25);
-    this.characterContext.drawImage(this.images.wizard, sx, sy, 25, 25, cx, cy, 25, 25);
+
+    this.characterContext.clearRect(cx, cy, renderSize, renderSize);
+    this.characterContext.drawImage(this.images.wizard, sx, sy, spriteSize, spriteSize, cx, cy, renderSize, renderSize);
   }
 
   bindUserInteractions(actions: UserInteractions) {
