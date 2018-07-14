@@ -41,7 +41,7 @@ export default class DOMCanvasRenderer implements Renderer {
 
     const spriteSize = imgSize / 2;
     const cx = (config.WIEWPORT_WIDTH / 2) - (renderSize / 2);
-    const cy = (config.WIEWPORT_HEIGHT / 2) - (renderSize / 2);
+    const cy = (config.WIEWPORT_HEIGHT / 2) - (renderSize / 2) - 15;
     let sx;
     let sy;
 

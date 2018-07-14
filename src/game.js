@@ -1,4 +1,4 @@
-import { RawMap, RawMapLayer, ParsedMap, Renderer, Collection } from './types';
+import { RawMap, RawMapLayer, ParsedMap, Renderer, Collection, CharacterData } from './types';
 import Character from './character';
 import maps from './maps';
 import materials from './materials';
@@ -30,9 +30,9 @@ export default class Game {
     this.map = this._parseMap(rawMap);
   }
 
-  loadCharacter() {
-    this.character = new Character(0, 0, 'down');
-    this.renderer.renderCharacter(this.character.dir);
+  loadCharacter(data: CharacterData) {
+    this.character = new Character(data);
+    this.renderer.renderCharacter(this.character.position.dir);
   }
 
   start() {
@@ -58,8 +58,8 @@ export default class Game {
 
     const tileWidth = Math.ceil(this.config.WIEWPORT_WIDTH / this.config.H_TILES);
     const tileHeight = Math.ceil(this.config.WIEWPORT_HEIGHT / this.config.V_TILES);
-    const middleX = this.character.x - Math.floor(this.config.H_TILES / 2);
-    const middleY = this.character.y - Math.floor(this.config.V_TILES / 2);
+    const middleX = this.character.position.x - Math.floor(this.config.H_TILES / 2);
+    const middleY = this.character.position.y - Math.floor(this.config.V_TILES / 2);
     const visibleMap = this._getVisiblePortion(middleX, middleY);
     this.renderer.renderMap(visibleMap.tiles, tileWidth, tileHeight);
 
@@ -111,42 +111,42 @@ export default class Game {
     };
   }
 
+  _tryToMoveCharacter(dir: string) {
+    if (this.character.changeDirection(dir)) {
+      this.renderer.renderCharacter(this.character.position.dir);
+    }
+    if (this._canCharacterMoveTo(dir)) {
+      this.character.move(dir);
+    }
+  }
+
   _canCharacterMoveTo(dir: string) {
     let x;
     let y;
     switch (dir) {
       case 'up':
-        x = this.character.x;
-        y = this.character.y - 1;
+        x = this.character.position.x;
+        y = this.character.position.y - 1;
         break;
       case 'down':
-        x = this.character.x;
-        y = this.character.y + 1;
+        x = this.character.position.x;
+        y = this.character.position.y + 1;
         break;
       case 'left':
-        x = this.character.x - 1;
-        y = this.character.y;
+        x = this.character.position.x - 1;
+        y = this.character.position.y;
         break;
       case 'right':
-        x = this.character.x + 1;
-        y = this.character.y;
+        x = this.character.position.x + 1;
+        y = this.character.position.y;
         break;
       default:
         return false;
     }
 
     if (this.map.tiles[x] && this.map.tiles[x][y]) {
-      return !this.map.tiles[x][y].m.bh || this.map.tiles[x][y].m.bh.enter(this);
+      return !this.map.tiles[x][y].m.bh || this.map.tiles[x][y].m.bh.enter(this.character);
     }
     return false;
-  }
-
-  _tryToMoveCharacter(dir: string) {
-    if (this.character.changeDirection(dir)) {
-      this.renderer.renderCharacter(this.character.dir);
-    }
-    if (this._canCharacterMoveTo(dir)) {
-      this.character.move(dir);
-    }
   }
 }

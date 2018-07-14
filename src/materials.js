@@ -1,3 +1,4 @@
+import Character from './character';
 import { Collection, Material } from './types';
 
 const materials: Collection<Material> = {
@@ -16,7 +17,7 @@ const materials: Collection<Material> = {
   water: {
     bg: '#4c96e0',
     bh: {
-      enter: (ch: Character) => ch.canMoveThroughWater
+      enter: (ch: Character) => ch.capabilities.canMoveThroughWater
     }
   }
 };

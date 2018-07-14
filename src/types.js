@@ -41,7 +41,46 @@ export type UserInteractions = {
   releaseMovement: () => void;
 }
 
+export type CharacterPosititon = {
+  x: number;
+  y: number;
+  dir: string;
+}
+
+export type CharacterVitals = {
+  curHealth: number;
+  totalHealth: number;
+  curMana: number;
+  totalMana: number;
+}
+
+export type CharacterStats = {
+  physDmg: number;
+  physDef: number;
+  magicDmg: number;
+  magicDef: number;
+}
+
+export type CharacterProgression = {
+  level: number;
+  currentExp: number;
+  expToNextLvl: number;
+}
+
+export type ChataracterCapabilities = {
+  canMoveThroughWater: boolean;
+}
+
+export type CharacterData = {
+  position: CharacterPosititon;
+  vitals: CharacterVitals;
+  stats: CharacterStats;
+  progression: CharacterProgression;
+  capabilities: ChataracterCapabilities;
+}
+
 export interface Renderer {
   renderMap(Tile[][], number, number): void;
+  renderCharacter(string): boolean;
   bindUserInteractions(UserInteractions): void;
 }
