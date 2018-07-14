@@ -6,25 +6,30 @@ export default class Character {
     this.canMoveThroughWater = false;
   }
 
-  move(where: string) {
+  move(where: string): boolean {
     switch (where) {
       case 'up':
-        this.dir = 'up';
         this.y--;
-        break;
+        return true;
       case 'down':
-        this.dir = 'down';
         this.y++;
-        break;
+        return true;
       case 'left':
-        this.dir = 'left';
         this.x--;
-        break;
+        return true;
       case 'right':
-        this.dir = 'right';
         this.x++;
-        break;
+        return true;
       default: break;
     }
+    return false;
+  }
+
+  changeDirection(dir): boolean {
+    if (this.dir !== dir) {
+      this.dir = dir;
+      return true;
+    }
+    return false;
   }
 }

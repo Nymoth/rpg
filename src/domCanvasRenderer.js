@@ -1,3 +1,4 @@
+import config from './config';
 import { UserInteractions, Tile, Renderer } from './types';
 
 export default class DOMCanvasRenderer implements Renderer {
@@ -5,10 +6,25 @@ export default class DOMCanvasRenderer implements Renderer {
     this.document = document;
     this.width = width;
     this.height = height;
+    this.images = {};
 
     this.canvasContainer = this._bootstrapGlobal();
     this.mapContext = this._createCanvas();
     this.characterContext = this._createCanvas(100);
+  }
+
+  async loadImages(): Promise<void> {
+    const sources = [
+      'wizard.png'
+    ];
+    const imgs = sources.map((name: string) => this._loadImage(`/assets/img/${name}`));
+    this.images = (await Promise.all(imgs))
+      .map((img, i) => ({
+        name: sources[i].split('.')[0],
+        img
+      }))
+      // eslint-disable-next-line no-param-reassign
+      .reduce((a, { name, img }) => { a[name] = img; return a; }, {});
   }
 
   renderMap(tiles: Tile[][], tileWidth: number, tileHeight: number) {
@@ -20,7 +36,31 @@ export default class DOMCanvasRenderer implements Renderer {
   }
 
   renderCharacter(dir: string) {
-
+    let sx;
+    let sy;
+    switch (dir) {
+      case 'up':
+        sx = 25;
+        sy = 0;
+        break;
+      case 'down':
+        sx = 0;
+        sy = 25;
+        break;
+      case 'left':
+        sx = 25;
+        sy = 25;
+        break;
+      case 'right':
+        sx = 0;
+        sy = 0;
+        break;
+      default: return;
+    }
+    const cx = (config.WIEWPORT_WIDTH / 2) - 12.5;
+    const cy = (config.WIEWPORT_HEIGHT / 2) - 12.5;
+    this.characterContext.clearRect(cx, cy, 25, 25);
+    this.characterContext.drawImage(this.images.wizard, sx, sy, 25, 25, cx, cy, 25, 25);
   }
 
   bindUserInteractions(actions: UserInteractions) {
@@ -79,6 +119,15 @@ export default class DOMCanvasRenderer implements Renderer {
     canvas.style.height = '100%';
     this.canvasContainer.appendChild(canvas);
     return canvas.getContext('2d');
+  }
+
+
+  _loadImage(src: string): Promise<Image> {
+    return new Promise((res) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => res(img);
+    });
   }
 
   _drawTile(tile: Tile, x: number, y: number, w: number, h: number) {

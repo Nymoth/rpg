@@ -32,6 +32,7 @@ export default class Game {
 
   loadCharacter() {
     this.character = new Character(0, 0, 'down');
+    this.renderer.renderCharacter(this.character.dir);
   }
 
   start() {
@@ -44,29 +45,7 @@ export default class Game {
   _processFrame() {
     if (this.state.TRAVEL) {
       if (this.timers.MOV === 0) {
-        switch (this.state.MOV) {
-          case 'up':
-            if (this._canMoveTo(this.character.x, this.character.y - 1)) {
-              this.character.move('up');
-            }
-            break;
-          case 'down':
-            if (this._canMoveTo(this.character.x, this.character.y + 1)) {
-              this.character.move('down');
-            }
-            break;
-          case 'left':
-            if (this._canMoveTo(this.character.x - 1, this.character.y)) {
-              this.character.move('left');
-            }
-            break;
-          case 'right':
-            if (this._canMoveTo(this.character.x + 1, this.character.y)) {
-              this.character.move('right');
-            }
-            break;
-          default: break;
-        }
+        this._tryToMoveCharacter(this.state.MOV);
         this.timers.MOV = 10;
       }
 
@@ -132,10 +111,42 @@ export default class Game {
     };
   }
 
-  _canMoveTo(x: number, y: number) {
+  _canCharacterMoveTo(dir: string) {
+    let x;
+    let y;
+    switch (dir) {
+      case 'up':
+        x = this.character.x;
+        y = this.character.y - 1;
+        break;
+      case 'down':
+        x = this.character.x;
+        y = this.character.y + 1;
+        break;
+      case 'left':
+        x = this.character.x - 1;
+        y = this.character.y;
+        break;
+      case 'right':
+        x = this.character.x + 1;
+        y = this.character.y;
+        break;
+      default:
+        return false;
+    }
+
     if (this.map.tiles[x] && this.map.tiles[x][y]) {
       return !this.map.tiles[x][y].m.bh || this.map.tiles[x][y].m.bh.enter(this);
     }
     return false;
+  }
+
+  _tryToMoveCharacter(dir: string) {
+    if (this.character.changeDirection(dir)) {
+      this.renderer.renderCharacter(this.character.dir);
+    }
+    if (this._canCharacterMoveTo(dir)) {
+      this.character.move(dir);
+    }
   }
 }
